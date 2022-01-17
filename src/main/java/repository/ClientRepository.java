@@ -1,6 +1,7 @@
 package repository;
 
 import entity.Client;
+import entity.Response;
 import utils.DbConfig;
 
 import java.sql.*;
@@ -23,6 +24,7 @@ public class ClientRepository {
             client.setId(resultSet.getInt(1));
             client.setName(resultSet.getString(2));
             client.setActive(resultSet.getBoolean(3));
+            client.setPhone(resultSet.getString(4));
             clientList.add(client);
         }
         return clientList;
@@ -55,11 +57,47 @@ public class ClientRepository {
         return execute;
     }
 
-    public static void clientUpdate() {
-        
+    public static Response clientUpdate() throws SQLException {
+        System.out.print("Enter the name : ");
+        String name=SCANNER_STR.nextLine();
+        System.out.print("Enter the old phone : ");
+        String phone=SCANNER_STR.nextLine();
+        System.out.print("Enter the new phone : ");
+        String n_phone=SCANNER_STR.nextLine();
+        Response response = new Response();
+        Connection connection = DbConfig.ulanish();
+        CallableStatement callableStatement = connection.prepareCall("{call client_update(?,?,?,?,?)}");
+        callableStatement.setString(1, name);
+        callableStatement.setString(2, phone);
+        callableStatement.setString(3,n_phone);
+        callableStatement.registerOutParameter(4, Types.BOOLEAN);
+        callableStatement.registerOutParameter(5, Types.VARCHAR);
+
+        callableStatement.execute();
+        response.setSuccess(callableStatement.getBoolean(4));
+        response.setMessage(callableStatement.getString(5));
+        System.out.println("Client updated 😉😉😉");
+
+        return response;
     }
 
-    public static void clientDelete() {
+    public static Response clientDelete() throws SQLException {
+        System.out.print("Enter the phone : ");
+        String name=SCANNER_STR.nextLine();
+        Response response = new Response();
+        Connection connection = DbConfig.ulanish();
+        CallableStatement callableStatement = connection.prepareCall("{call client_delete(?,?,?)}");
+        callableStatement.setString(1, name);
+        callableStatement.registerOutParameter(2, Types.BOOLEAN);
+        callableStatement.registerOutParameter(3, Types.VARCHAR);
+
+        callableStatement.execute();
+        response.setSuccess(callableStatement.getBoolean(2));
+        response.setMessage(callableStatement.getString(3));
+
+        System.out.println("Client deleted 🙄🙄🙄");
+
+        return response;
 
     }
 }
